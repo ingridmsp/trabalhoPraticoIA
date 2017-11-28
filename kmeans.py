@@ -40,6 +40,7 @@ def kmeans(cent,k,it):
 	                num = z
 	                
 	        d[keys[i]] = num
+	        print(nlists[num])
 
     print(d)            
 
