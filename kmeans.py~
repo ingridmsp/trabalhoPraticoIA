@@ -26,13 +26,12 @@ def main():
 	    c = c+1
 	F.close()
 	res = kmeans(centroids,k,iterations,sumx,sumy)
-	#print(res)
+	print(res)
 	
 	
 def kmeans(cent,k,it,sumx,sumy):
     c = cent
     for x in range(0,it):
-        print(c)
         d = aux(c,it,sumx,sumy)
         for a in range(0,it):
             c[a] = str(sumx[a]/len(keys))+","+str(sumy[a]/len(keys))
