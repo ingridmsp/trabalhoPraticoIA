@@ -1,8 +1,12 @@
 import sys
 from math import sqrt
+import numpy as np
 
 dic = {}
 d = {}
+sumx = []
+sumy = []
+nums = []
 keys = []
 
 def main():
@@ -15,6 +19,7 @@ def main():
 	#    centroids[i].append(str(randomx)+","+str(randomy))
 	sumx = [0]*k
 	sumy = [0]*k
+	nums = [0]*k
 	
 	F = open(file,"r")
 	c = 0
@@ -26,25 +31,26 @@ def main():
 		    keys.append(words[0])
 	    c = c+1
 	F.close()
-	res = kmeans(centroids,k,iterations,sumx,sumy)
+	res = kmeans(centroids,k,iterations)
 	#print(res)
 	
 	
-def kmeans(cent,k,it,sumx,sumy):
+def kmeans(cent,k,it):
     c = cent
     for x in range(0,it):
         print(c)
-        d = aux(c,k,it,sumx,sumy)
+        d = aux(c,k,it)
         for a in range(0,k):
             c[a] = str(sumx[a]/len(sumx))+","+str(sumy[a]/len(sumy))
             
     return d	
 	
-def aux(cent,k,it,sumx,sumy):
+def aux(cent,k,it):
 
     for b in range(0,k):
         sumx[b] = 0
         sumy[b] = 0
+        nums[b] = 0
     
     for i in range(len(keys)):
         c = cent[0].split(',')
@@ -61,6 +67,7 @@ def aux(cent,k,it,sumx,sumy):
         print(d)
         sumx[num] += float(dic[keys[i]][0])
         sumy[num] += float(dic[keys[i]][1])
+        nums[num] += 1
             
     return d	
 
