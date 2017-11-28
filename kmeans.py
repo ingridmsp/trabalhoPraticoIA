@@ -27,7 +27,6 @@ def main():
 	
 def kmeans(cent,k,it):
 
-    for x in range(0,it):
 	    for i in range(len(keys)):
 	        menor = sqrt((pow(float(dic[keys[i]][0])-cent[0][0],2)) + (pow(float(dic[keys[i]][1])-cent[0][1],2)))
 	        num = 0
