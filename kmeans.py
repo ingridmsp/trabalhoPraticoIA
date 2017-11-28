@@ -3,7 +3,6 @@ from math import sqrt
 
 dic = {}
 d = {}
-nlists = {}
 keys = []
 
 def main():
@@ -13,7 +12,6 @@ def main():
 	centroids = {0:(11.111,8.644),1:(13.222,5.444),2:(8.988,11.444)} # so pra teste aleatorio
 	# for i in range(0,iterations):
 	#    centroids[i] = (randomx,randomy)
-	nlists = {0:(0,0),1:(0,0),2:(0,0)}
 	
 	F = open(file,"r")
 	c = 0
@@ -40,7 +38,6 @@ def kmeans(cent,k,it):
 	                num = z
 	                
 	        d[keys[i]] = num
-	        print(nlists[num])
 
     print(d)            
 
