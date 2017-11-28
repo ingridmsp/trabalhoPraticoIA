@@ -31,21 +31,21 @@ def main():
 		    keys.append(words[0])
 	    c = c+1
 	F.close()
-	res = kmeans(centroids,k,iterations)
+	res = kmeans(centroids,k,iterations,sumx,sumy,nums)
 	#print(res)
 	
 	
-def kmeans(cent,k,it):
+def kmeans(cent,k,it,sumx,sumy,nums):
     c = cent
     for x in range(0,it):
         print(c)
-        d = aux(c,k,it)
+        d = aux(c,k,it,sumx,sumy,nums)
         for a in range(0,k):
             c[a] = str(sumx[a]/nums[a])+","+str(sumy[a]/nums[a])
             
     return d	
 	
-def aux(cent,k,it):
+def aux(cent,k,it,sumx,sumy,nums):
 
     for b in range(0,k):
         sumx[b] = 0
