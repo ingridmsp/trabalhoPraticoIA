@@ -33,15 +33,22 @@ def main():
 	F.close()
 	res = kmeans(centroids,k,iterations,sumx,sumy,nums)
 	
+	file = file.split('.')
+	file =file[0]+"Result.clu"
+	arq = open(file,"w")
+
+	for x in range(0,len(res)):
+		arq.write(keys[x]+"	"+str(d[keys[x]])+'\n')	 		
 	
+	arq.close()
 def kmeans(cent,k,it,sumx,sumy,nums):
     c = cent
     for x in range(0,it):
-        print(c)
         d = aux(c,k,it,sumx,sumy,nums) # faz uma iteracao
-        for a in range(0,k):
-            c[a] = str(sumx[a]/nums[a])+","+str(sumy[a]/nums[a]) # recalcula os centroids
-            
+    
+    for a in range(0,k):
+	    if nums[a] > 0 :
+	        c[a] = str(sumx[a]/nums[a])+","+str(sumy[a]/nums[a]) # recalcula os centroids       
     return d	
 
 	
@@ -64,7 +71,7 @@ def aux(cent,k,it,sumx,sumy,nums):
                 num = z
                 
         d[keys[i]] = num 
-        print(d)
+
 	# atualiza as somas e numero de elementos do cluster
         sumx[num] += float(dic[keys[i]][0])
         sumy[num] += float(dic[keys[i]][1])
