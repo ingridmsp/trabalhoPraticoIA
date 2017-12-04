@@ -14,7 +14,7 @@ def main():
 	#    centroids[i].append(str(randomx)+','+str(randomy))
 	sumx = [0]*iterations
 	sumy = [0]*iterations
-	
+
 	F = open(file,"r")
 	c = 0
 	for line in F:
@@ -27,8 +27,8 @@ def main():
 	F.close()
 	res = kmeans(centroids,k,iterations,sumx,sumy)
 	#print(res)
-	
-	
+
+
 def kmeans(cent,k,it,sumx,sumy):
     c = cent
     for x in range(0,it):
@@ -36,15 +36,15 @@ def kmeans(cent,k,it,sumx,sumy):
         d = aux(c,it,sumx,sumy)
         for a in range(0,it):
             c[a] = str(sumx[a]/len(keys))+","+str(sumy[a]/len(keys))
-            
-    return d	
-	
+
+    return d
+
 def aux(cent,it,sumx,sumy):
 
     for b in range(0,it):
         sumx[b] = 0
         sumy[b] = 0
-    
+
     for i in range(len(keys)):
         c = cent[0].split(',')
         menor = sqrt((pow(float(dic[keys[i]][0])-float(c[0]),2)) + (pow(float(dic[keys[i]][1])-float(c[1]),2)))
@@ -55,12 +55,12 @@ def aux(cent,it,sumx,sumy):
             if dist < menor:
                 menor = dist
                 num = z
-                
+
         d[keys[i]] = num
         sumx[num] += float(dic[keys[i]][0])
         sumy[num] += float(dic[keys[i]][1])
-            
-    return d	
+
+    return d
 
 if __name__ == '__main__':
 	main()
