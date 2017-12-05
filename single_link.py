@@ -9,9 +9,9 @@ def main():
 
     tam_matriz = qtd_particoes(sys.argv[1])
     matriz = cria_matriz_inicial(particoes, tam_matriz)
-    dists = cria_vetor_dists(particoes, tam_matriz)
-    print(dists)
-    #print(matriz)
+    #dists = cria_vetor_dists(particoes, tam_matriz)
+    #print(dists)
+    print(matriz)
 
 def le_arquivo(dataset):
     nlinhas = qtd_particoes(dataset)
@@ -41,6 +41,17 @@ def qtd_particoes(dataset):
 def cria_matriz_inicial(particoes, tam_matriz):
     """
     Cria a matriz triangular de distâncias entre todos os pontos da entrada.
+    Retorna uma matriz esparsa pra tentar melhorar um pouquinho esse lixo que é a complexidade desse algoritmo.
+    Parâmetros
+    ----------
+    particoes   :   array
+        array com as posições x e y de cada elemento
+    tam_matriz  :   int
+        inteiro com a quantidade de particoes
+    Retorno
+    -------
+    matriz_esparsa  :   lil_matrix
+        matriz esparsa com todas as distâncias calculadas
     """
     matriz = np.zeros((tam_matriz, tam_matriz))
     for linha in range(0, tam_matriz):
@@ -53,8 +64,10 @@ def cria_matriz_inicial(particoes, tam_matriz):
     matriz_esparsa = ss.lil_matrix(matriz)
     return matriz_esparsa
 
-# conferir o RuntimeWarning
 def dist(x0, x1, y0, y1):
+    """
+    Calcula a distância euclidiana entre os pontos
+    """
     return np.sqrt((x1 - x0)**2 + (y1 - y0)**2)
 
 
@@ -74,10 +87,6 @@ def cria_vetor_dists(particoes, tam_matriz):
     # falta ordernar o vetor e ordenar os identificadores ao mesmo tempo de uma maneira minimamente decente
 
     return npdists
-
-def sorting(vet_dist, identificadores):
-    return "essa função vai ser burra"
-
 
 if __name__ == '__main__':
     main()
