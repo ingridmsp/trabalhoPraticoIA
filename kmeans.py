@@ -32,6 +32,7 @@ def main():
 	    c = c+1
 	F.close()
 	res = kmeans(centroids,k,iterations,sumx,sumy,nums)
+	sorted(res)
 	
 	file = file.split('.')
 	file =file[0]+"Result.clu"
@@ -44,11 +45,12 @@ def main():
 def kmeans(cent,k,it,sumx,sumy,nums):
     c = cent
     for x in range(0,it):
+        print(c)
         d = aux(c,k,it,sumx,sumy,nums) # faz uma iteracao
     
-    for a in range(0,k):
-	    if nums[a] > 0 :
-	        c[a] = str(sumx[a]/nums[a])+","+str(sumy[a]/nums[a]) # recalcula os centroids       
+        for a in range(0,k):
+	        if nums[a] > 0 :
+	            c[a] = str(sumx[a]/nums[a])+","+str(sumy[a]/nums[a]) # recalcula os centroids       
     return d	
 
 	
