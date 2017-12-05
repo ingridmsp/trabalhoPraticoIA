@@ -9,9 +9,12 @@ def main():
 
     tam_matriz = qtd_particoes(sys.argv[1])
     matriz = cria_matriz_inicial(particoes, tam_matriz)
-    #dists = cria_vetor_dists(particoes, tam_matriz)
-    #print(dists)
-    print(matriz)
+    #print(matriz)
+    minimo, teste_x, teste_y = acha_minimo(matriz, tam_matriz)
+    print("A menor distância é entre os clusters {} e {}".format(identificador[teste_x], identificador[teste_y]))
+    print("teste linha matriz pro cluster {}: {}".format( identificador[teste_x], matriz[teste_x][:]))
+    print("teste linha matriz pro cluster {}: {}".format( identificador[teste_y], matriz[teste_y][:]))
+
 
 def le_arquivo(dataset):
     nlinhas = qtd_particoes(dataset)
@@ -52,17 +55,16 @@ def cria_matriz_inicial(particoes, tam_matriz):
     -------
     matriz_esparsa  :   lil_matrix
         matriz esparsa com todas as distâncias calculadas
+    minimo  : int
+        primeira distância mínima
     """
     matriz = np.zeros((tam_matriz, tam_matriz))
     for linha in range(0, tam_matriz):
-        matriz[linha][linha] = 0
-
-        for coluna in range(0, tam_matriz):
-            if(coluna > linha):
-                matriz[linha][coluna] = dist(particoes[linha][0], particoes[coluna][0], particoes[linha][1], particoes[coluna][1])
-
-    matriz_esparsa = ss.lil_matrix(matriz)
-    return matriz_esparsa
+        for coluna in range(linha+1, tam_matriz):
+            matriz[linha][coluna] = dist(particoes[linha][0], particoes[coluna][0], particoes[linha][1], particoes[coluna][1])
+   # matriz_esparsa = ss.lil_matrix(matriz)
+   # return matriz_esparsa
+    return matriz
 
 def dist(x0, x1, y0, y1):
     """
@@ -71,22 +73,29 @@ def dist(x0, x1, y0, y1):
     return np.sqrt((x1 - x0)**2 + (y1 - y0)**2)
 
 
-def cria_vetor_dists(particoes, tam_matriz):
+def acha_minimo(matriz, tam_matriz):
     """
-    Cria vetor ordenado de distâncias.
+    Acha o mínimo da matriz desconsiderando diagonais
     """
-    #tam_vet = (tam_matriz**2/2)-tam_matriz
-
-    dists = []
+    minimo = matriz[0, 1]
+    pos_x = 0
+    pos_y = 1
     for linha in range(0, tam_matriz):
-        for coluna in range(0, tam_matriz):
-            if(coluna > linha):
-                dists.append(dist(particoes[linha][0], particoes[coluna][0], particoes[linha][1], particoes[coluna][1]))
-    npdists = np.asarray(dists)
+        for coluna in range(linha+1, tam_matriz):
+            if(matriz[linha, coluna] < minimo):
+                minimo = matriz[linha, coluna]
+                pos_x = linha
+                pos_y = coluna
+    return minimo, pos_x, pos_y;
 
-    # falta ordernar o vetor e ordenar os identificadores ao mesmo tempo de uma maneira minimamente decente
+def merge(cA, cB, matriz):
+    """
+    Faz o merge entre os clusters de menor distância euclidiana
+    """
 
-    return npdists
+    #comparar matriz[cA][:] c/ matriz[cB][:] e manter quem for menor
+
+    return "nada acontece feijoada"
 
 if __name__ == '__main__':
     main()
