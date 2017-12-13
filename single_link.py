@@ -20,9 +20,9 @@ def main():
         matriz[x][y] = 0
         matriz = merge(x, y, matriz, tam_matriz)
         # exclui primeira coluna
-        matriz = np.delete(matriz, 0, 1)
+        matriz = np.delete(matriz, y, 1)
         tam_matriz -= 1
-        print("A menor distância é entre os clusters {} e {}, com mínimo igual a {}".format(identificador[x], identificador[y], minimo))
+        print("A menor distância é entre os clusters {} (posição{}) e {}(posição{}), com mínimo igual a {}".format(identificador[x], x,  identificador[y], y, minimo))
         if(x > y):
             # adiciona x ao cluster de y
             identificador[y] = str(identificador[y]) + ", " + str(identificador[x])
@@ -95,21 +95,13 @@ def acha_minimo(matriz, tam_matriz):
     """
     Acha o mínimo da matriz desconsiderando diagonais
     """
-    pos_x = 0
-    pos_y = 1
-    minimo = matriz[0][0]
-    for i in range(0, tam_matriz):
-        if(matriz[0][i] != 0):
-            minimo = matriz[0][i]
 
-    for linha in range(0, tam_matriz):
-        # dá pra manter esse for pq agora a matriz continua triangular
-        for coluna in range(linha+1, tam_matriz):
-        #for coluna in range(0, tam_matriz):
-            if(matriz[linha, coluna] < minimo and matriz[linha, coluna]> 0):
-                minimo = matriz[linha][coluna]
-                pos_x = linha
-                pos_y = coluna
+    minimo = np.amin(matriz[np.nonzero(matriz > 0)])
+
+    teste = np.argwhere(matriz == minimo)
+    pos_x = teste[0][0]
+    pos_y = teste[0][1]
+
     return minimo, pos_x, pos_y;
 
 def merge(cA, cB, matriz, tam_matriz):
