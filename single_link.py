@@ -17,7 +17,6 @@ def main():
         matriz = merge(x, y, matriz, tam_matriz)
         matriz = np.delete(matriz, y, 1)
         tam_matriz -= 1
-        #print("A menor distância é entre os clusters {} (posição{}) e {}(posição{}), com mínimo igual a {}".format(identificador[x], x,  identificador[y], y, minimo))
         if(x > y):
             # adiciona x ao cluster de y
             identificador[y] = str(identificador[y]) + ", " + str(identificador[x])
@@ -84,7 +83,7 @@ def dist(x0, x1, y0, y1):
     """
     Calcula a distância euclidiana entre os pontos
     """
-    return np.sqrt((x1 - x0)**2 + (y1 - y0)**2)
+    return ((x1 - x0)**2 + (y1 - y0)**2)**0.5
 
 def acha_minimo(matriz, tam_matriz):
     """
@@ -93,9 +92,9 @@ def acha_minimo(matriz, tam_matriz):
     """
     minimo = np.amin(matriz[np.nonzero(matriz > 0)])
 
-    teste = np.argwhere(matriz == minimo)
-    pos_x = teste[0][0]
-    pos_y = teste[0][1]
+    idx_pos = np.argwhere(matriz == minimo)
+    pos_x = idx_pos[0][0]
+    pos_y = idx_pos[0][1]
 
     return minimo, pos_x, pos_y;
 
@@ -105,7 +104,7 @@ def merge(cA, cB, matriz, tam_matriz):
     """
 
     for i in range(0, tam_matriz):
-        # se as duas linhas tiverem valores válidos e um for maior que o outro
+        # as duas linhas tiverem valores válidos
         if(matriz[cA][i] > 0 and matriz[cB][i] > 0):
             if(matriz[cA][i] <= matriz[cB][i]):
                 matriz[cB][i] = 0
@@ -114,8 +113,7 @@ def merge(cA, cB, matriz, tam_matriz):
                 matriz[cB][i] = 0
             else:
                 pass
-        # se o segundo cluster tiver posição de valor 0, é preciso checar
-        # a coluna da matriz
+        # segundo cluster tem posição de valor 0
         elif(matriz[cB][i] == 0):
             if(matriz[cA][i] <= matriz[i][cB]):
                 matriz[cB][i] = 0
