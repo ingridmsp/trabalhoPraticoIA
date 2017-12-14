@@ -9,7 +9,7 @@ def main():
     kMax = int(sys.argv[3])
 
     tam_matriz = qtd_particoes(sys.argv[1])
-    iteracoes = tam_matriz - kMax
+    iteracoes = tam_matriz - kMin
     matriz = cria_matriz_inicial(particoes, tam_matriz)
 
     for i in range(0, iteracoes):
@@ -19,14 +19,16 @@ def main():
         tam_matriz -= 1
         if(x > y):
             # adiciona x ao cluster de y
-            identificador[y] = str(identificador[y]) + ", " + str(identificador[x])
+            identificador[y] = str(identificador[y]) + "," + str(identificador[x])
             del identificador[x]
         else:
             # adiciona y ao cluster de x
-            identificador[x] = str(identificador[x]) + ", " + str(identificador[y])
+            identificador[x] = str(identificador[x]) + "," + str(identificador[y])
             del identificador[y]
+        print(matriz)
 
-    print(matriz)
+        if(tam_matriz <= kMax):
+            escreve_arquivo(identificador, tam_matriz)
     print("Tempo de execução: {}".format(datetime.now()-startTime))
 
 def le_arquivo(dataset):
@@ -34,21 +36,21 @@ def le_arquivo(dataset):
     particoes = np.zeros((nlinhas, 2))
     identificador = []
 
-    try:
-        with open(dataset) as f:
-            next(f)
-            i = 0
-            for linha in f:
-                parametros = linha.replace('\n', '').split('\t')
-                identificador.append(parametros[0])
-                if(i == nlinhas - 1):
-                    break
+    with open(dataset, 'r') as f:
+        next(f)
+        i = 0
+        for linha in f:
+            parametros = linha.replace('\n', '').split('\t')
+            identificador.append(parametros[0])
+            if(i == nlinhas - 1):
+                break
+            try:
                 particoes[i,0] = float(parametros[1])
                 particoes[i,1] = float(parametros[2])
                 i += 1
-    except EnvironmentError as erro:
-        print("Verifique se os parâmetros do seu arquivo estão separados por tabs.")
-        print(erro)
+            except Exception as erro:
+                print("Erro de índice. Verifique se os parâmetros do seu arquivo estão separados por tabs.")
+                break
     f.close()
     return particoes, identificador
 
@@ -60,8 +62,7 @@ def qtd_particoes(dataset):
 
 def cria_matriz_inicial(particoes, tam_matriz):
     """
-    Cria a matriz triangular de distâncias entre todos os pontos da entrada.
-    Retorna uma matriz esparsa pra tentar melhorar um pouquinho esse lixo que é a complexidade desse algoritmo.
+    Cria a matriz triangular superior de distâncias entre todos os pontos da entrada.
     Parâmetros
     ----------
     particoes   :   array
@@ -83,7 +84,7 @@ def dist(x0, x1, y0, y1):
     """
     Calcula a distância euclidiana entre os pontos
     """
-    return ((x1 - x0)**2 + (y1 - y0)**2)**0.5
+    return np.sqrt((x1 - x0)**2 + (y1 - y0)**2)
 
 def acha_minimo(matriz, tam_matriz):
     """
@@ -124,6 +125,22 @@ def merge(cA, cB, matriz, tam_matriz):
                 pass
     matriz = np.delete(matriz, cB, axis=0)
     return matriz
+
+def escreve_arquivo(identificador, tam_matriz):
+    """
+    Escreve nos arquivos de saída de acordo com formato especificado:
+        cluster_label\tcluster_id
+    """
+    nome_arquivo = sys.argv[1].replace('.txt', '') + '_' + str(tam_matriz) + '.txt'
+    with open(nome_arquivo, 'w') as f:
+        # escreve escreve escreve
+        for idx in range(0, tam_matriz):
+            clusters = identificador[idx].split(',')
+            for label in clusters:
+                linha = label + '\t' + str(idx) + '\n'
+                f.write(linha)
+    f.close()
+    return nome_arquivo
 
 if __name__ == '__main__':
     main()
