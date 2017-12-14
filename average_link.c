@@ -204,10 +204,24 @@ void merge(int *menor, float **matriz, int tam_el, Elemento *el, Clusters *clus)
 	}
 	else if(el[i].cluster != -1 && el[j].cluster == -1){
 		//SIGNIFICA QUE O ELEMENTO i PERTENCE A UM CLUSTER, MAS j NÃO
+		el[j].cluster = el[i].cluster;
+		clus->c[qt].elem[clus->c[qt].qt_elementos] = &el[j];
+		clus->c[qt].qt_elementos++;
+		
+		recalcula_dist(matriz, tam_el, el, qt, clus);
+		
+		clus->qt_clusters++;
 		
 	}
 	else if(el[i].cluster == -1 && el[j].cluster != -1){
 		//SIGNIFICA QUE O ELEMENTO j PERTENCE A UM CLUSTER, MAS i NÃO
+		el[i].cluster = el[j].cluster;
+		clus->c[qt].elem[clus->c[qt].qt_elementos] = &el[i];
+		clus->c[qt].qt_elementos++;
+		
+		recalcula_dist(matriz, tam_el, el, qt, clus);
+		
+		clus->qt_clusters++;
 	}
 	else{
 		//OS DOIS PERTENCEM A UM CLUSTER, FUSÃO DE CLUSTERS! TEEENSO
@@ -313,6 +327,11 @@ void recalcula_dist(float **matriz, int tam, Elemento *el, int id, Clusters *clu
 			}
 		}
 	}
+	
+	for(i=0;i<clus->qt_clusters;i++){
+		free(dists[i].distancia);
+	}
+	free(dists);
 }
 
 void exibe_clusters(Clusters clus){
