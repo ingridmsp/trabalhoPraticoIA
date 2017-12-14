@@ -1,6 +1,7 @@
 import sys
 from math import sqrt
 import numpy as np
+import random
 
 dic = {} # dicionario que possui ids e coordenadas
 d = {} # estrutura resultante da iteracao
@@ -13,24 +14,24 @@ def main():
 	file = sys.argv[1]
 	k = int(sys.argv[2])
 	iterations = int(sys.argv[3])
-	#centroids = ["11.111,8.644","13.222,5.444","8.988,11.444"] # so pra teste aleatorio
-	centroids = ["1.0,1.0","5.0,7.0"]
-	# for i in range(0,k):
-	#    centroids[i].append(str(randomx)+","+str(randomy))
+
 	sumx = [0]*k
 	sumy = [0]*k
 	nums = [0]*k
 	
 	F = open(file,"r")
 	c = 0
+	lcen = []
 	for line in F:
 	    if c != 0 : # ignora a primeira linha do arquivo
 		    words = line.split() # pega cada linha e faz o split nos espacos em branco
+		    lcen.append(words[1]+","+words[2]) # faz uma lista com todos os pontos em str pra pegar centroides aleatorios    
 		    point = words[1],words[2] # coordenadas
 		    dic[words[0]] = point
 		    keys.append(words[0])
 	    c = c+1
 	F.close()
+	centroids = random.sample(lcen,k) # cria k centroids aleatorios
 	res = kmeans(centroids,k,iterations,sumx,sumy,nums)
 	sorted(res)
 	
