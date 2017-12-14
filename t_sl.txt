@@ -1,0 +1,8 @@
+teste   l1  l2
+nome1   1.00    1.00
+nome2   1.5 2.0
+nome3   4.0 3.0
+nome4   5.0 7.0
+nome5   3.5 5.0
+nome6   5.0 2.5
+nome7   3.5 4.5
