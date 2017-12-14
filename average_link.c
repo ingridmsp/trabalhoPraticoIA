@@ -19,6 +19,7 @@ typedef struct cluster{
 typedef struct clusters{
 	Cluster *c;
 	int qt_clusters;
+	int total_elementos;
 } Clusters;
 
 typedef struct retorno{
@@ -47,9 +48,13 @@ void recalcula_dist(float **matriz, int tam, Elemento *el, int id, Clusters *clu
 
 void exibe_matriz(float **matriz, int tam);
 
+Retorno pega_menor(float **matriz, int tam);
+
+void exibe_elementos(Elemento *el, int tam);
+
 
 int main(int argc, char *argv[]){
-	int kmin, kmax, tam_el;
+	int kmin, kmax, tam_el, continua = -2;
 	char *ptr;
 	float **matriz;
 	Clusters clus;
@@ -63,6 +68,7 @@ int main(int argc, char *argv[]){
 	el = (Elemento *) malloc(tam_el * sizeof(Elemento));
 	
 	clus.qt_clusters = 0;
+	clus.total_elementos = 0;
 	clus.c = (Cluster *) malloc(tam_el * sizeof(Cluster));
 	
 	le_arquivo(argv[1], el, tam_el);
@@ -70,12 +76,41 @@ int main(int argc, char *argv[]){
 	ret = cria_matriz(matriz, tam_el, el);
 	matriz = ret.matriz;
 
-	exibe_matriz(matriz, tam_el);	printf("\n\n");
+//	exibe_matriz(matriz, tam_el);	printf("\n\n");
+//	exibe_elementos(el, tam_el);	printf("\n\n");
 
 	merge(ret.menor, matriz, tam_el, el, &clus);
-	exibe_matriz(matriz, tam_el);
+
+//	exibe_matriz(matriz ,tam_el);	printf("\n\n\n");
+//	exibe_elementos(el, tam_el);	printf("\n\n\n");
 	
+	//para usar os K: de max a min clusters. Fiz cagado. Como arrumar?
+	//acho que se fizer a conta os k clusters contem todos os elems (conta pelo n de elementos dos clusters); usar total_elementos de Clusters;
+	while(continua){
+		ret = pega_menor(matriz, tam_el);
+//		printf("ret: i: %d, j: %d\n", ret.menor[0], ret.menor[1]);
+
+		merge(ret.menor, matriz, tam_el, el, &clus);
+		if(clus.total_elementos == tam_el){
+			if(clus.qt_clusters <= kmax){
+				if(clus.qt_clusters == kmin){
+					continua = 0;
+				}
+				else{
+					//printa num arquivo
+				}
+			}
+		}
+		
+		printf("n total em cluster: %d\n", clus.total_elementos);
+		
+//		exibe_matriz(matriz ,tam_el);	printf("\n\n\n");
+//		exibe_elementos(el, tam_el);	printf("\n\n\n**************************************************\n");
+//		continua++;
+	}
 	
+	exibe_matriz(matriz, tam_el);	printf("\n\n");
+	exibe_elementos(el, tam_el);	printf("\n\n");
 	exibe_clusters(clus);
 }
 
@@ -180,15 +215,20 @@ float calc_dist(Elemento el1, Elemento el2){
 }
 
 void merge(int *menor, float **matriz, int tam_el, Elemento *el, Clusters *clus){
-	int i, j, qt, l;
+	int i, j, k, qt, teste, id, idaux;
+	Elemento **aux;
 	
 	i = menor[0];
 	j = menor[1];
 	qt = clus->qt_clusters;
 	
+			printf("n clusters: %d\n", clus->qt_clusters);
+	
 	if(el[i].cluster == -1 && el[j].cluster == -1){
+	
+		printf("entrou aqui1\n"); //scanf(" %d", &teste);
+	
 		//SIGNIFICA QUE OS DOIS ELEMENTOS A SEREM JUNTADOS NÃO PERTECEM A UM CLUSTER
-//			printf("oier\n"); scanf(" %d", l);
 		clus->c[qt].id = qt;
 		clus->c[qt].qt_elementos = 2;
 		clus->c[qt].elem = (Elemento **) malloc(2 * sizeof(Elemento*));
@@ -198,38 +238,131 @@ void merge(int *menor, float **matriz, int tam_el, Elemento *el, Clusters *clus)
 		el[i].cluster = qt;
 		el[j].cluster = qt;
 		
-		recalcula_dist(matriz, tam_el, el, qt, clus);
 		
 		clus->qt_clusters++;
+		recalcula_dist(matriz, tam_el, el, qt, clus);
+
+		clus->total_elementos = clus->total_elementos + 2;
 	}
 	else if(el[i].cluster != -1 && el[j].cluster == -1){
+			printf("entrou aqui2\n"); //scanf(" %d", &teste);
 		//SIGNIFICA QUE O ELEMENTO i PERTENCE A UM CLUSTER, MAS j NÃO
-		el[j].cluster = el[i].cluster;
-		clus->c[qt].elem[clus->c[qt].qt_elementos] = &el[j];
-		clus->c[qt].qt_elementos++;
+		id = el[i].cluster;
+		el[j].cluster = id;
 		
-		recalcula_dist(matriz, tam_el, el, qt, clus);
+		aux = (Elemento **) malloc((clus->c[id].qt_elementos + 1) * sizeof(Elemento*));
+		for(k=0;k<clus->c[id].qt_elementos;k++){
+			aux[k] = clus->c[id].elem[k];
+		}
 		
-		clus->qt_clusters++;
+		free(clus->c[id].elem);
+		clus->c[id].elem = aux;
 		
+		
+		clus->c[id].elem[clus->c[id].qt_elementos] = &el[j];
+		clus->c[id].qt_elementos++;
+		
+		printf("qt elementos: %d\n\n", clus->c[id].qt_elementos);
+		
+		clus->total_elementos++;
+		recalcula_dist(matriz, tam_el, el, id, clus);		
 	}
 	else if(el[i].cluster == -1 && el[j].cluster != -1){
+			printf("entrou aqui3\n");// scanf(" %d", &teste);
 		//SIGNIFICA QUE O ELEMENTO j PERTENCE A UM CLUSTER, MAS i NÃO
-		el[i].cluster = el[j].cluster;
-		clus->c[qt].elem[clus->c[qt].qt_elementos] = &el[i];
-		clus->c[qt].qt_elementos++;
+		id = el[j].cluster;
+		el[i].cluster = id;
 		
-		recalcula_dist(matriz, tam_el, el, qt, clus);
+		aux = (Elemento **) malloc((clus->c[id].qt_elementos + 1) * sizeof(Elemento*));
+		for(k=0;k<clus->c[id].qt_elementos;k++){
+			aux[k] = clus->c[id].elem[k];
+		}
 		
-		clus->qt_clusters++;
+		free(clus->c[id].elem);
+		clus->c[id].elem = aux;
+		
+		clus->c[id].elem[clus->c[id].qt_elementos] = &el[i];
+		clus->c[id].qt_elementos++;
+		
+		clus->total_elementos++;
+		recalcula_dist(matriz, tam_el, el, id, clus);
 	}
 	else{
+		printf("entrou aqui4\n"); //scanf(" %d", &teste);
+
 		//OS DOIS PERTENCEM A UM CLUSTER, FUSÃO DE CLUSTERS! TEEENSO
+		//caso o cluster de i tenha id menor: (necessario sempre manter no menor para ficar consistente)
+		if(el[i].cluster < el[j].cluster){
+		
+					printf("entrou aqui\n5");// scanf(" %d", &teste);
+		
+			id = el[i].cluster;
+			idaux = el[j].cluster;
+			
+			//copiando elementos do cluster de j para o de i:
+			aux = (Elemento **) malloc((clus->c[id].qt_elementos + clus->c[idaux].qt_elementos) * sizeof(Elemento*));
+			for(k=0;k<clus->c[id].qt_elementos;k++){
+				aux[k] = clus->c[id].elem[k];
+			}
+			
+			free(clus->c[id].elem);
+			clus->c[id].elem = aux;
+			
+			for(k=0;k<clus->c[idaux].qt_elementos;k++){
+				clus->c[id].elem[clus->c[id].qt_elementos] = clus->c[idaux].elem[k];
+				clus->c[id].elem[clus->c[id].qt_elementos]->cluster = id;
+				
+				clus->c[id].qt_elementos++;
+			}
+			
+			//apagando o cluster de j, dando shift e renomeando todos os clusters depois dele:
+			for(k=idaux;k<clus->qt_clusters-1;k++){
+				clus->c[k] = clus->c[k+1];
+			}
+			clus->c[k].elem = NULL;
+			clus->qt_clusters--;
+			
+			recalcula_dist(matriz, tam_el, el, id, clus);
+		}
+		//caso o cluster de j tenha id menor:
+		else if(el[j].cluster < el[i].cluster){
+		
+					printf("entrou aqui6\n"); //scanf(" %d", &teste);
+		
+			id = el[j].cluster;
+			idaux = el[i].cluster;
+			
+			//copiando elementos do cluster de i para o de j:
+			aux = (Elemento **) malloc((clus->c[id].qt_elementos + clus->c[idaux].qt_elementos) * sizeof(Elemento*));
+			for(k=0;k<clus->c[id].qt_elementos;k++){
+				aux[k] = clus->c[id].elem[k];
+			}
+			
+			free(clus->c[id].elem);
+			clus->c[id].elem = aux;
+			
+			for(k=0;k<clus->c[idaux].qt_elementos;k++){
+				clus->c[id].elem[clus->c[id].qt_elementos] = clus->c[idaux].elem[k];
+				clus->c[id].elem[clus->c[id].qt_elementos]->cluster = id;
+				
+				clus->c[id].qt_elementos++;
+			}
+			
+			//apagando o cluster de i, dando shift e renomeando todos os clusters depois dele:
+			for(k=idaux;k<clus->qt_clusters-1;k++){
+				clus->c[k] = clus->c[k+1];
+			}
+			clus->c[k].elem = NULL;
+			clus->qt_clusters--;
+			
+			recalcula_dist(matriz, tam_el, el, id, clus);
+		}
 	}
 }
 
+
 void recalcula_dist(float **matriz, int tam, Elemento *el, int id, Clusters *clus){
-	int i, j, k, l;
+	int i, j, k, l, teste;
 	float soma;
 	Distancias *dists;
 	
@@ -243,6 +376,17 @@ void recalcula_dist(float **matriz, int tam, Elemento *el, int id, Clusters *clu
 		dists[i].distancia[i] = 0;
 	}
 	
+/*	printf("********************************\nDISTANCIAS");
+	for(i=0;i<clus->qt_clusters;i++){
+		printf("\n\ncluster %d:", i);
+		for(j=0;j<clus->qt_clusters;j++){
+			printf(" %f,", dists[i].distancia[j]);
+		}
+	}
+	printf("\n\n\n");
+	
+	printf("TAMANHO: %d\n\n", tam);*/
+	
 	for(i=0;i<tam;i++){
 		for(j=0;j<tam;j++){
 			//só faz as contas para as iteracoes que nos interessam (sem repeticao, sem contar dist 0)
@@ -251,38 +395,35 @@ void recalcula_dist(float **matriz, int tam, Elemento *el, int id, Clusters *clu
 					soma = 0;
 				}
 				//para os casos de um pertencer a um cluster e outro não:
-				else if(el[i].cluster == id || el[j].cluster == id){
-					//se o que não pertence a um cluster é j:
-					if(el[i].cluster == id && el[j].cluster == -1){
-						soma = 0;
-						for(k=0;k<clus->c[id].qt_elementos;k++){
-							soma = soma + calc_dist(*(clus->c[id].elem[k]), el[j]);
-						}
-						soma = soma / clus->c[id].qt_elementos;
+				//se o que não pertence a um cluster é j:
+				else if(el[i].cluster == id && el[j].cluster == -1){
+					soma = 0;
+					for(k=0;k<clus->c[id].qt_elementos;k++){
+						soma = soma + calc_dist(*(clus->c[id].elem[k]), el[j]);
+					}
+					soma = soma / clus->c[id].qt_elementos;
 						
-						matriz[i][j] = soma;
+					matriz[i][j] = soma;
+				}
+				//se o que não pertence a um cluster é i:
+				else if(el[i].cluster == -1 && el[j].cluster == id){
+					soma = 0;
+					for(k=0;k<clus->c[id].qt_elementos;k++){
+						soma = soma + calc_dist(*(clus->c[id].elem[k]), el[i]);
 					}
-					//se o que não pertence a um cluster é i:
-					else if(el[i].cluster == -1 && el[j].cluster == id){
-						soma = 0;
-						for(k=0;k<clus->c[id].qt_elementos;k++){
-							soma = soma + calc_dist(*(clus->c[id].elem[k]), el[i]);
-						}
-						soma = soma / clus->c[id].qt_elementos;
+					soma = soma / clus->c[id].qt_elementos;
 						
-						matriz[i][j] = soma;
-					}
-					//se os dois pertencem ao mesmo cluster:
-					else{
-						matriz[i][j] = -2;		//faz elementos do mesmo cluster ficarem com dist -2
-					}
+					matriz[i][j] = soma;
+				}
+				//se os dois pertencem ao mesmo cluster:
+				else if(el[i].cluster == id && el[j].cluster == id){
+					matriz[i][j] = -2;		//faz elementos do mesmo cluster ficarem com dist -2
 				}
 				//para os casos de os dois pertencerem a um cluster (nao o mesmo, chequei com o -2 de dist):
-				
 				//para os casos em que o cluster que demos merge ser o i:
 				else if(el[i].cluster == id && el[j].cluster != -1){
 					//checa se a distancia entre os dois já foi calcula (se sim, está guardada na struct dists); Se não:
-					if(dists[i].distancia[j] == -1){
+					if(dists[el[i].cluster].distancia[el[j].cluster] == -1){
 						//calcula a distancia de cada elemento pra cada elemento, armazena em soma, divide tudo no final por |clusterA|*|clusterB|
 						soma = 0;
 						for(k=0;k<clus->c[id].qt_elementos;k++){
@@ -290,23 +431,30 @@ void recalcula_dist(float **matriz, int tam, Elemento *el, int id, Clusters *clu
 								soma = soma + calc_dist(*(clus->c[id].elem[k]), *(clus->c[el[j].cluster].elem[l]));
 							}
 						}
+						
 					
 						soma = soma / (clus->c[id].qt_elementos * clus->c[el[j].cluster].qt_elementos);
 					
 						matriz[i][j] = soma;
 						
 						//adicionando essa distância (reflexiva) na struct de distâncias:
-						dists[i].distancia[j] = soma;
-						dists[j].distancia[i] = soma;
+						dists[el[i].cluster].distancia[el[j].cluster] = soma;
+						dists[el[j].cluster].distancia[el[i].cluster] = soma;
+						
+//							printf("ENTROU AQUI ESPECIAL\n********************************\nDISTANCIAS");
+							printf("\n\n\n");
 					}
 					//Se sim:
 					else{
-						matriz[i][j] = dists[i].distancia[j];
+//						printf("\n\ncopiando %f para m[%d][%d]\n\n", dists[el[i].cluster].distancia[el[j].cluster, i, j]);
+						matriz[i][j] = dists[el[i].cluster].distancia[el[j].cluster];
 					}
 				}
 				//para os casos em que o cluster que demos merge ser o j: (consultar o elseif acima para detalhes)
 				else if(el[i].cluster != -1 && el[j].cluster == id){
-					if(dists[i].distancia[j] == -1){
+//					printf("eljcluster: %d, elicluster: %d", el[j].cluster, el[i].cluster);// scanf(" %d", &teste);
+				
+					if(dists[el[j].cluster].distancia[el[i].cluster] == -1){
 						soma = 0;
 						for(k=0;k<clus->c[id].qt_elementos;k++){
 							for(l = 0;l<clus->c[el[i].cluster].qt_elementos;l++){
@@ -317,11 +465,15 @@ void recalcula_dist(float **matriz, int tam, Elemento *el, int id, Clusters *clu
 						soma = soma / (clus->c[id].qt_elementos * clus->c[el[i].cluster].qt_elementos);
 					
 						matriz[i][j] = soma;
-						dists[i].distancia[j] = soma;
-						dists[j].distancia[i] = soma;
+						
+						dists[el[i].cluster].distancia[el[j].cluster] = soma;
+						dists[el[j].cluster].distancia[el[i].cluster] = soma;
+						
+//							printf("ENTROU AQUI ESPECIAL\n********************************\nDISTANCIAS");						
 					}
 					else{
-						matriz[i][j] = dists[i].distancia[j];			//nao me preocupo com o que é i e o que é j porque a dist é reflexiva
+//						printf("\n\ncopiando %f para m[%d][%d] com tam: %d\n\n", dists[el[i].cluster].distancia[el[j].cluster, i, j], tam);
+						matriz[i][j] = dists[el[i].cluster].distancia[el[j].cluster];			//nao me preocupo com o que é i e o que é j porque a dist é reflexiva
 					}
 				}
 			}
@@ -332,12 +484,14 @@ void recalcula_dist(float **matriz, int tam, Elemento *el, int id, Clusters *clu
 		free(dists[i].distancia);
 	}
 	free(dists);
+	
+	
 }
 
 void exibe_clusters(Clusters clus){
 	int i, j, k;
 	
-	printf("\n\nqt clusters: %d\n\n\n", clus.qt_clusters);
+	printf("\n\n\n********************************\nqt clusters: %d\n\n", clus.qt_clusters);
 	
 	for(i=0;i<clus.qt_clusters;i++){
 		printf("cluster id: %d\nqt_elementos: %d\n", clus.c[i].id, clus.c[i].qt_elementos);
@@ -357,4 +511,46 @@ void exibe_matriz(float **matriz, int tam){
 		}
 		printf("\n");
 	}
+}
+
+void exibe_elementos(Elemento *el, int tam){
+	//print dos elementos pra teste:
+	int i, j;
+	for(i=0;i<tam;i++){
+		printf("nome: %s\nx: %f\ny: %f\ncluster: %d", el[i].nome, el[i].x, el[i].y, el[i].cluster);
+		printf("\n");
+	}
+}
+
+
+Retorno pega_menor(float **matriz, int tam){
+	int i, j, teste, flag =0;
+	float menor;
+	Retorno ret;
+	
+
+	for(i=0;i<tam;i++){
+		for(j=0;j<tam;j++){
+			if(matriz[i][j] > 0){
+				if(flag == 0){
+					menor = matriz[i][j];
+					ret.menor[0] = i;
+					ret.menor[1] = j;
+					
+					flag = 1;
+				}				
+				else if(matriz[i][j] < menor){
+					ret.menor[0] = i;
+					ret.menor[1] = j;
+				
+					menor = matriz[i][j];
+				}
+			}
+		}
+	}
+	
+	printf("menor: %f\n", menor);
+
+	ret.matriz = matriz;
+	return ret;
 }
