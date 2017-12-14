@@ -1,5 +1,7 @@
 import sys
+import cProfile
 import numpy as np
+from natsort import natsorted
 from datetime import datetime
 
 def main():
@@ -25,8 +27,6 @@ def main():
             # adiciona y ao cluster de x
             identificador[x] = str(identificador[x]) + "," + str(identificador[y])
             del identificador[y]
-        print(matriz)
-
         if(tam_matriz <= kMax):
             escreve_arquivo(identificador, tam_matriz)
     print("Tempo de execução: {}".format(datetime.now()-startTime))
@@ -136,7 +136,8 @@ def escreve_arquivo(identificador, tam_matriz):
         # escreve escreve escreve
         for idx in range(0, tam_matriz):
             clusters = identificador[idx].split(',')
-            for label in clusters:
+            sorted_clusters = natsorted(clusters)
+            for label in sorted_clusters:
                 linha = label + '\t' + str(idx) + '\n'
                 f.write(linha)
     f.close()
@@ -144,3 +145,4 @@ def escreve_arquivo(identificador, tam_matriz):
 
 if __name__ == '__main__':
     main()
+    #cProfile.run('main()')  #procura por gargalos no código
