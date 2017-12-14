@@ -1,9 +1,9 @@
 import sys
 import numpy as np
-import scipy.sparse as ss
-from collections import deque
+from datetime import datetime
 
 def main():
+    startTime = datetime.now()
     particoes, identificador = le_arquivo(sys.argv[1])
     kMin = int(sys.argv[2])
     kMax = int(sys.argv[3])
@@ -12,28 +12,23 @@ def main():
     iteracoes = tam_matriz - kMax
     matriz = cria_matriz_inicial(particoes, tam_matriz)
 
-    print("-----------MATRIZ INICIAL---------\n{}\n".format(matriz))
-    for i in range(0, 5):
-        print("\nITERAÇÃO {}".format(i))
+    for i in range(0, iteracoes):
         minimo, x, y = acha_minimo(matriz, tam_matriz)
-        # descarta o primeiro mínimo
-        matriz[x][y] = 0
         matriz = merge(x, y, matriz, tam_matriz)
-        # exclui primeira coluna
         matriz = np.delete(matriz, y, 1)
         tam_matriz -= 1
-        print("A menor distância é entre os clusters {} (posição{}) e {}(posição{}), com mínimo igual a {}".format(identificador[x], x,  identificador[y], y, minimo))
+        #print("A menor distância é entre os clusters {} (posição{}) e {}(posição{}), com mínimo igual a {}".format(identificador[x], x,  identificador[y], y, minimo))
         if(x > y):
             # adiciona x ao cluster de y
             identificador[y] = str(identificador[y]) + ", " + str(identificador[x])
             del identificador[x]
-            print(identificador)
         else:
             # adiciona y ao cluster de x
             identificador[x] = str(identificador[x]) + ", " + str(identificador[y])
             del identificador[y]
-            print(identificador)
-        print(matriz)
+
+    print(matriz)
+    print("Tempo de execução: {}".format(datetime.now()-startTime))
 
 def le_arquivo(dataset):
     nlinhas = qtd_particoes(dataset)
@@ -94,8 +89,8 @@ def dist(x0, x1, y0, y1):
 def acha_minimo(matriz, tam_matriz):
     """
     Acha o mínimo da matriz desconsiderando diagonais
+    e valores zerados
     """
-
     minimo = np.amin(matriz[np.nonzero(matriz > 0)])
 
     teste = np.argwhere(matriz == minimo)
@@ -110,16 +105,25 @@ def merge(cA, cB, matriz, tam_matriz):
     """
 
     for i in range(0, tam_matriz):
-        #print("cA: {}".format(matriz[cA][i]))
-        #print("cB: {}".format(matriz[cB][i]))
-        # checar coluna
-        if(matriz[cA][i] > 0 and matriz[cB][i] > 0 and matriz[cA][i] <= matriz[cB][i]):
-            matriz[cB][i] = 0
-        elif(matriz[cA][i] > matriz[cB][i] and matriz[cB][i] > 0):
-            matriz[cA][i] = matriz[cB][i]
-            matriz[cB][i] = 0
-        else:
-            pass
+        # se as duas linhas tiverem valores válidos e um for maior que o outro
+        if(matriz[cA][i] > 0 and matriz[cB][i] > 0):
+            if(matriz[cA][i] <= matriz[cB][i]):
+                matriz[cB][i] = 0
+            elif(matriz[cA][i] > matriz[cB][i]):
+                matriz[cA][i] = matriz[cB][i]
+                matriz[cB][i] = 0
+            else:
+                pass
+        # se o segundo cluster tiver posição de valor 0, é preciso checar
+        # a coluna da matriz
+        elif(matriz[cB][i] == 0):
+            if(matriz[cA][i] <= matriz[i][cB]):
+                matriz[cB][i] = 0
+            elif(matriz[cA][i] > matriz[i][cB]):
+                matriz[cA][i] = matriz[i][cB]
+                matriz[i][cB] = 0
+            else:
+                pass
     matriz = np.delete(matriz, cB, axis=0)
     return matriz
 
