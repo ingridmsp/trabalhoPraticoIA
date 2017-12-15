@@ -53,7 +53,7 @@ Retorno pega_menor(float **matriz, int tam);
 
 void exibe_elementos(Elemento *el, int tam);
 
-void salvar(Clusters clus, char *nome_arquivo);
+void salvar(Elemento *el, int tam, char *nome_arquivo);
 
 int main(int argc, char *argv[]){
 	int kmin, kmax, tam_el, continua = -2;
@@ -99,7 +99,7 @@ int main(int argc, char *argv[]){
 				}
 				
 				sprintf(nome_arquivo, "Resultado %s  -%d-", argv[1], clus.qt_clusters);
-				salvar(clus, nome_arquivo);
+				salvar(el, tam_el, nome_arquivo);
 			}
 		}
 		
@@ -491,16 +491,14 @@ Retorno pega_menor(float **matriz, int tam){
 	return ret;
 }
 
-void salvar(Clusters clus, char *nome_arquivo) {
-	int i, j;
+void salvar(Elemento *el, int tam, char *nome_arquivo) {
+	int i;
 	FILE *arquivo;
 
 	arquivo = fopen(nome_arquivo, "w"); //cria novo arquivo
 
-	for(i=0;i<clus.qt_clusters;i++){       //para cada cluster
-		for(j=0;j<clus.c[i].qt_elementos;j++){   //para cada elemento
-			fprintf(arquivo,"%s\t%d\n", clus.c[i].elem[j]->nome, clus.c[i].elem[j]->cluster + 1); //escreve registros
-		}
+	for(i=0;i<tam;i++){       //para cada cluster
+		fprintf(arquivo,"%s\t%d\n", el[i].nome, el[i].cluster + 1); //escreve registros
 	}
     
 	fclose(arquivo);
