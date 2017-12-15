@@ -2,6 +2,7 @@ import sys
 from math import sqrt
 import numpy as np
 import random
+import time 
 
 dic = {} # dicionario que possui ids e coordenadas
 d = {} # estrutura resultante da iteracao
@@ -11,6 +12,7 @@ nums = [] # quantidade de elementos em cada cluster
 keys = [] # vetor de ids 
 
 def main():
+	start = time.time()
 	file = sys.argv[1]
 	k = int(sys.argv[2])
 	iterations = int(sys.argv[3])
@@ -43,6 +45,7 @@ def main():
 		arq.write(keys[x]+"	"+str(d[keys[x]])+'\n')	 		
 	
 	arq.close()
+	print("time in seconds: ",time.time()-start)
 def kmeans(cent,k,it,sumx,sumy,nums):
     c = cent
     for x in range(0,it):
