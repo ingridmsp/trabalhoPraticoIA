@@ -100,7 +100,7 @@ int main(int argc, char *argv[]){
 				tam_nome = strlen(argv[1]);
 				strncpy(nomeaux, argv[1], tam_nome-4);
 				
-				sprintf(nome_arquivo, "Resultado %s  -%d-.clu", nomeaux, clus.qt_clusters);
+				sprintf(nome_arquivo, "average-link_%s_%d.clu", nomeaux, clus.qt_clusters);
 				salvar(el, tam_el, nome_arquivo);
 			}
 		}
