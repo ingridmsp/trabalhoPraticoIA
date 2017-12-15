@@ -42,7 +42,7 @@ def main():
 	arq = open(file,"w")
 
 	for x in range(0,len(res)):
-		arq.write(keys[x]+"	"+str(d[keys[x]])+'\n')
+		arq.write(keys[x]+"\t"+str(d[keys[x]])+'\n')
 
 	arq.close()
 	print("time in seconds: ", time.time()-start)

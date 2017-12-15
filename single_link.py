@@ -71,8 +71,8 @@ def cria_matriz_inicial(particoes, tam_matriz):
         inteiro com a quantidade de particoes
     Retorno
     -------
-    minimo  : int
-        primeira distância mínima
+    matriz
+        matriz densa de distâncias
     """
     matriz = np.zeros((tam_matriz, tam_matriz))
     for linha in range(0, tam_matriz):
@@ -90,6 +90,13 @@ def acha_minimo(matriz, tam_matriz):
     """
     Acha o mínimo da matriz desconsiderando diagonais
     e valores zerados
+    Retorno:
+    minimo
+        minimo
+    pos_x
+        posicao em x do valor mínimo da matriz
+    pos_y
+        posicao em y do valor mínimo da matriz
     """
     minimo = np.amin(matriz[np.nonzero(matriz > 0)])
 
@@ -107,20 +114,14 @@ def merge(cA, cB, matriz, tam_matriz):
     for i in range(0, tam_matriz):
         # as duas linhas tiverem valores válidos
         if(matriz[cA][i] > 0 and matriz[cB][i] > 0):
-            if(matriz[cA][i] <= matriz[cB][i]):
-                matriz[cB][i] = 0
-            elif(matriz[cA][i] > matriz[cB][i]):
+            if(matriz[cA][i] > matriz[cB][i]):
                 matriz[cA][i] = matriz[cB][i]
-                matriz[cB][i] = 0
             else:
                 pass
         # segundo cluster tem posição de valor 0
         elif(matriz[cB][i] == 0):
-            if(matriz[cA][i] <= matriz[i][cB]):
-                matriz[cB][i] = 0
-            elif(matriz[cA][i] > matriz[i][cB]):
+            if(matriz[cA][i] > matriz[i][cB]):
                 matriz[cA][i] = matriz[i][cB]
-                matriz[i][cB] = 0
             else:
                 pass
     matriz = np.delete(matriz, cB, axis=0)
@@ -137,7 +138,7 @@ def escreve_arquivo(identificador, tam_matriz):
             clusters = identificador[idx].split(',')
             sorted_clusters = natsorted(clusters)
             for label in sorted_clusters:
-                linha = label + '\t' + str(idx) + '\n'
+                linha = label + '\t' + str(idx+1) + '\n'
                 f.write(linha)
     f.close()
     return nome_arquivo
