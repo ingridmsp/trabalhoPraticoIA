@@ -131,9 +131,8 @@ def escreve_arquivo(identificador, tam_matriz):
     Escreve nos arquivos de saída de acordo com formato especificado:
         cluster_label\tcluster_id
     """
-    nome_arquivo = sys.argv[1].replace('.txt', '') + '_' + str(tam_matriz) + '.txt'
+    nome_arquivo = 'single-link_' + sys.argv[1].replace('.txt', '') + '_' + str(tam_matriz) + '.clu'
     with open(nome_arquivo, 'w') as f:
-        # escreve escreve escreve
         for idx in range(0, tam_matriz):
             clusters = identificador[idx].split(',')
             sorted_clusters = natsorted(clusters)
