@@ -56,8 +56,8 @@ void exibe_elementos(Elemento *el, int tam);
 void salvar(Elemento *el, int tam, char *nome_arquivo);
 
 int main(int argc, char *argv[]){
-	int kmin, kmax, tam_el, continua = -2;
-	char *ptr, nome_arquivo[100];
+	int kmin, kmax, tam_el, continua = -2, tam_nome;
+	char *ptr, nome_arquivo[100], nomeaux[100];
 	float **matriz;
 	double time_spent;
 	Clusters clus;
@@ -97,8 +97,10 @@ int main(int argc, char *argv[]){
 				if(clus.qt_clusters == kmin){
 					continua = 0;
 				}
+				tam_nome = strlen(argv[1]);
+				strncpy(nomeaux, argv[1], tam_nome-4);
 				
-				sprintf(nome_arquivo, "Resultado %s  -%d-", argv[1], clus.qt_clusters);
+				sprintf(nome_arquivo, "Resultado %s  -%d-.clu", nomeaux, clus.qt_clusters);
 				salvar(el, tam_el, nome_arquivo);
 			}
 		}
@@ -498,7 +500,7 @@ void salvar(Elemento *el, int tam, char *nome_arquivo) {
 	arquivo = fopen(nome_arquivo, "w"); //cria novo arquivo
 
 	for(i=0;i<tam;i++){       //para cada cluster
-		fprintf(arquivo,"%s\t%d\n", el[i].nome, el[i].cluster + 1); //escreve registros
+		fprintf(arquivo,"%s\t%d\n", el[i].nome, el[i].cluster+1); //escreve registros
 	}
     
 	fclose(arquivo);
