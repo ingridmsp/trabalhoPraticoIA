@@ -499,7 +499,7 @@ void salvar(Clusters clus, char *nome_arquivo) {
 
 	for(i=0;i<clus.qt_clusters;i++){       //para cada cluster
 		for(j=0;j<clus.c[i].qt_elementos;j++){   //para cada elemento
-			fprintf(arquivo,"%s\t%d\n", clus.c[i].elem[j]->nome, clus.c[i].elem[j]->cluster); //escreve registros
+			fprintf(arquivo,"%s\t%d\n", clus.c[i].elem[j]->nome, clus.c[i].elem[j]->cluster + 1); //escreve registros
 		}
 	}
     
